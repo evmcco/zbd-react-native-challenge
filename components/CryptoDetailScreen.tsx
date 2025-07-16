@@ -11,8 +11,8 @@ import {
   View
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { getCryptocurrencyChart, getCryptocurrencyDetail } from '../services/detailService';
-import type { ChartDataPoint, CryptocurrencyDetail } from '../services/types';
+import { getCryptocurrencyDetail } from '../services/detailService';
+import type { CryptocurrencyDetail } from '../services/types';
 import { formatMarketCap, formatPercentageChange, formatPrice } from '../services/utils';
 import { PriceChart } from './PriceChart';
 
@@ -23,19 +23,13 @@ interface CryptoDetailScreenProps {
 
 export const CryptoDetailScreen = ({ onClose, cryptoId }: CryptoDetailScreenProps) => {
   const [cryptoDetail, setCryptoDetail] = useState<CryptocurrencyDetail | null>(null);
-  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchCryptoDetail = useCallback(async () => {
     setLoading(true);
     try {
-      const [detail, chart] = await Promise.all([
-        getCryptocurrencyDetail(cryptoId),
-        getCryptocurrencyChart(cryptoId, 1), // 1 day = 24 hours
-      ]);
-
+      const detail = await getCryptocurrencyDetail(cryptoId);
       setCryptoDetail(detail);
-      setChartData(chart);
     } catch (error) {
       Alert.alert('Error', 'Failed to fetch cryptocurrency details');
     } finally {
@@ -150,7 +144,7 @@ export const CryptoDetailScreen = ({ onClose, cryptoId }: CryptoDetailScreenProp
                 </View>
               </View>
 
-              <PriceChart chartData={chartData} currentPrice={formatPrice(cryptoDetail?.current_price || 0)} />
+              <PriceChart cryptoId={cryptoId} currentPrice={formatPrice(cryptoDetail?.current_price || 0)} />
 
               <View className="p-4 space-y-4">
                 <Text className="text-lg font-semibold text-gray-900 mb-2">
