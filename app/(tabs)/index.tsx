@@ -3,6 +3,7 @@ import { Image } from 'expo-image';
 import { useState } from 'react';
 import { Platform, StyleSheet, Text, TouchableOpacity } from 'react-native';
 
+import { CryptoDetailScreen } from '@/components/CryptoDetailScreen';
 import { CryptoDrawer } from '@/components/CryptoDrawer';
 import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
@@ -13,6 +14,16 @@ import "../../global.css";
 
 export default function HomeScreen() {
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+  const [selectedCryptoId, setSelectedCryptoId] = useState<string | null>(null);
+
+  const handleCryptoSelect = (cryptoId: string) => {
+    setSelectedCryptoId(cryptoId);
+    setIsDrawerVisible(false);
+  };
+
+  const handleDetailClose = () => {
+    setSelectedCryptoId(null);
+  };
 
   return (
     <>
@@ -78,7 +89,15 @@ export default function HomeScreen() {
       <CryptoDrawer
         isVisible={isDrawerVisible}
         onClose={() => setIsDrawerVisible(false)}
+        onCryptoSelect={handleCryptoSelect}
       />
+
+      {selectedCryptoId && (
+        <CryptoDetailScreen
+          onClose={handleDetailClose}
+          cryptoId={selectedCryptoId}
+        />
+      )}
     </>
   );
 }

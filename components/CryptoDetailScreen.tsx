@@ -1,0 +1,261 @@
+import { Ionicons } from '@expo/vector-icons';
+import React, { useCallback, useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  Dimensions,
+  Image,
+  Modal,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { LineGraph } from 'react-native-graph';
+import { getCryptocurrencyChart, getCryptocurrencyDetail } from '../services/detailService';
+import type { ChartDataPoint, CryptocurrencyDetail } from '../services/types';
+import { formatMarketCap, formatPercentageChange, formatPrice } from '../services/utils';
+
+interface CryptoDetailScreenProps {
+  onClose: () => void;
+  cryptoId: string;
+}
+
+const screenWidth = Dimensions.get('window').width;
+
+export const CryptoDetailScreen = ({ onClose, cryptoId }: CryptoDetailScreenProps) => {
+  const [cryptoDetail, setCryptoDetail] = useState<CryptocurrencyDetail | null>(null);
+  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchCryptoDetail = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [detail, chart] = await Promise.all([
+        getCryptocurrencyDetail(cryptoId),
+        getCryptocurrencyChart(cryptoId, 1), // 1 day = 24 hours
+      ]);
+
+      setCryptoDetail(detail);
+      setChartData(chart);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to fetch cryptocurrency details');
+    } finally {
+      setLoading(false);
+    }
+  }, [cryptoId]);
+
+  useEffect(() => {
+    if (cryptoId) {
+      fetchCryptoDetail();
+    }
+  }, [cryptoId, fetchCryptoDetail]);
+
+
+
+  const renderStatCard = (title: string, value: string, change?: number) => (
+    <View className="bg-white p-4 rounded-lg border border-gray-200">
+      <Text className="text-sm text-gray-500 mb-1">{title}</Text>
+      <Text className="text-lg font-semibold text-gray-900">{value}</Text>
+      {change !== undefined && (
+        <Text
+          className={`text-sm font-medium ${change >= 0 ? 'text-green-600' : 'text-red-600'
+            }`}
+        >
+          {formatPercentageChange(change)}
+        </Text>
+      )}
+    </View>
+  );
+
+  if (!cryptoDetail && !loading) {
+    return (
+      <Modal
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={onClose}
+      >
+        <View className="flex-1 justify-center items-center bg-gray-50">
+          <Text className="text-lg text-gray-600">Failed to load cryptocurrency details</Text>
+          <TouchableOpacity
+            onPress={onClose}
+            className="mt-4 bg-blue-500 px-6 py-3 rounded-lg"
+          >
+            <Text className="text-white font-semibold">Close</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+    );
+  }
+
+  return (
+    <Modal
+      animationType="slide"
+      presentationStyle="pageSheet"
+      onRequestClose={onClose}
+    >
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <View className="flex-1 bg-gray-50">
+          <View className="flex-row items-center justify-between p-4 bg-white border-b border-gray-200">
+            <TouchableOpacity
+              onPress={onClose}
+              className="p-2 rounded-full bg-gray-100"
+            >
+              <Ionicons name="arrow-back" size={24} color="#374151" />
+            </TouchableOpacity>
+            <Text className="text-xl font-bold text-gray-900">
+              {cryptoDetail?.name || 'Loading...'}
+            </Text>
+            <View className="w-10" />
+          </View>
+
+          {loading ? (
+            <View className="flex-1 justify-center items-center">
+              <ActivityIndicator size="large" color="#3B82F6" />
+              <Text className="mt-4 text-gray-600">Loading details...</Text>
+            </View>
+          ) : (
+            <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+              {/* Header with coin info */}
+              <View className="bg-white p-6 border-b border-gray-200">
+                <View className="flex-row items-center mb-4">
+                  <Image
+                    source={{ uri: cryptoDetail?.image.large }}
+                    className="w-16 h-16 mr-4"
+                    resizeMode="contain"
+                  />
+                  <View className="flex-1">
+                    <Text className="text-2xl font-bold text-gray-900">
+                      {cryptoDetail?.name}
+                    </Text>
+                    <Text className="text-lg text-gray-500 uppercase">
+                      {cryptoDetail?.symbol}
+                    </Text>
+                    <Text className="text-sm text-gray-400">
+                      Rank #{cryptoDetail?.market_cap_rank}
+                    </Text>
+                  </View>
+                </View>
+
+                <View className="items-center">
+                  <Text className="text-3xl font-bold text-gray-900 mb-2">
+                    {formatPrice(cryptoDetail?.current_price || 0)}
+                  </Text>
+                  <Text
+                    className={`text-lg font-medium ${(cryptoDetail?.price_change_percentage_24h || 0) >= 0
+                      ? 'text-green-600'
+                      : 'text-red-600'
+                      }`}
+                  >
+                    {formatPercentageChange(cryptoDetail?.price_change_percentage_24h || 0)} (24h)
+                  </Text>
+                </View>
+              </View>
+
+              {/* 24h Price Chart */}
+              <View className="bg-white mx-4 mt-4 p-4 rounded-lg border border-gray-200">
+                <Text className="text-lg font-semibold text-gray-900 mb-4">
+                  24 Hour Price Chart
+                </Text>
+                {chartData.length > 0 ? (
+                  <LineGraph
+                    points={chartData}
+                    animated={true}
+                    color="#3B82F6"
+                    style={{ width: screenWidth - 64, height: 200 }}
+                    enablePanGesture={true}
+                    // enableIndicator={true}
+                    // indicatorPulsating={true}
+                    TopAxisLabel={() => (
+                      <Text className="text-xs text-gray-500">
+                        {formatPrice(Math.max(...chartData.map(p => p.value)))}
+                      </Text>
+                    )}
+                    BottomAxisLabel={() => (
+                      <Text className="text-xs text-gray-500">
+                        {formatPrice(Math.min(...chartData.map(p => p.value)))}
+                      </Text>
+                    )}
+                  />
+                ) : (
+                  <View className="h-48 justify-center items-center">
+                    <Text className="text-gray-500">Chart data not available</Text>
+                  </View>
+                )}
+              </View>
+
+              {/* Statistics Grid */}
+              <View className="p-4 space-y-4">
+                <Text className="text-lg font-semibold text-gray-900 mb-2">
+                  Statistics
+                </Text>
+
+                <View className="grid grid-cols-2 gap-4">
+                  {renderStatCard(
+                    'Market Cap',
+                    formatMarketCap(cryptoDetail?.market_cap || 0)
+                  )}
+                  {renderStatCard(
+                    '24h Volume',
+                    formatMarketCap(cryptoDetail?.total_volume || 0)
+                  )}
+                </View>
+
+                <View className="grid grid-cols-2 gap-4">
+                  {renderStatCard(
+                    '24h High',
+                    formatPrice(cryptoDetail?.high_24h || 0)
+                  )}
+                  {renderStatCard(
+                    '24h Low',
+                    formatPrice(cryptoDetail?.low_24h || 0)
+                  )}
+                </View>
+
+                <View className="grid grid-cols-2 gap-4">
+                  {renderStatCard(
+                    '7d Change',
+                    '',
+                    cryptoDetail?.price_change_percentage_7d
+                  )}
+                  {renderStatCard(
+                    '30d Change',
+                    '',
+                    cryptoDetail?.price_change_percentage_30d
+                  )}
+                </View>
+
+                {cryptoDetail?.circulating_supply && (
+                  <View className="grid grid-cols-2 gap-4">
+                    {renderStatCard(
+                      'Circulating Supply',
+                      cryptoDetail.circulating_supply.toLocaleString()
+                    )}
+                    {cryptoDetail.total_supply && renderStatCard(
+                      'Total Supply',
+                      cryptoDetail.total_supply.toLocaleString()
+                    )}
+                  </View>
+                )}
+              </View>
+
+              {/* Description */}
+              {cryptoDetail?.description?.en && (
+                <View className="bg-white mx-4 mb-4 p-4 rounded-lg border border-gray-200">
+                  <Text className="text-lg font-semibold text-gray-900 mb-2">
+                    About {cryptoDetail.name}
+                  </Text>
+                  <Text className="text-gray-700 leading-6">
+                    {cryptoDetail.description.en.replace(/<[^>]*>/g, '').slice(0, 500)}
+                    {cryptoDetail.description.en.length > 500 ? '...' : ''}
+                  </Text>
+                </View>
+              )}
+            </ScrollView>
+          )}
+        </View>
+      </GestureHandlerRootView>
+    </Modal>
+  );
+};

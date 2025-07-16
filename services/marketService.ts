@@ -1,15 +1,5 @@
-export interface Cryptocurrency {
-  id: string;
-  symbol: string;
-  name: string;
-  image: string;
-  current_price: number;
-  market_cap: number;
-  market_cap_rank: number;
-  price_change_percentage_24h: number;
-}
-
-const API_BASE_URL = 'https://api.coingecko.com/api/v3';
+import { API_BASE_URL } from './utils';
+import type { Cryptocurrency } from './types';
 
 // Cache configuration
 const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes in milliseconds
@@ -55,30 +45,4 @@ export const getTopCryptocurrencies = async (): Promise<Cryptocurrency[]> => {
     
     return [];
   }
-}
-
-export const formatPrice = (price: number): string => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 6,
-  }).format(price);
-}
-
-export const formatMarketCap = (marketCap: number): string => {
-  if (marketCap >= 1e12) {
-    return `$${(marketCap / 1e12).toFixed(2)}T`;
-  } else if (marketCap >= 1e9) {
-    return `$${(marketCap / 1e9).toFixed(2)}B`;
-  } else if (marketCap >= 1e6) {
-    return `$${(marketCap / 1e6).toFixed(2)}M`;
-  } else {
-    return `$${marketCap.toLocaleString()}`;
-  }
-}
-
-export const formatPercentageChange = (change: number): string  => {
-  const formatted = Math.abs(change).toFixed(2);
-  return `${change >= 0 ? '+' : '-'}${formatted}%`;
-}
+};
