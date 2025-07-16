@@ -1,5 +1,5 @@
+import type { ChartDataPoint, CryptocurrencyDetail } from './types';
 import { API_BASE_URL } from './utils';
-import type { CryptocurrencyDetail, ChartDataPoint } from './types';
 
 // Cache for cryptocurrency details
 const DETAIL_CACHE_DURATION = 5 * 1000; // 5 seconds in milliseconds
@@ -14,19 +14,14 @@ const isDetailCacheValid = (id: string): boolean => {
 export const getCryptocurrencyDetail = async (id: string): Promise<CryptocurrencyDetail | null> => {
   // Return cached data if it's still valid
   if (isDetailCacheValid(id)) {
-    console.log(`returning cached detail for ${id}`);
     return detailCache.get(id)!.data;
   }
 
   try {
-    console.log(`fetching detail for ${id}`);
     const url = `${API_BASE_URL}/coins/${id}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false`;
-    console.log(`API URL: ${url}`);
     
     const response = await fetch(url);
     
-    console.log(`Response status: ${response.status}`);
-    console.log(`Response headers:`, response.headers);
     
     if (!response.ok) {
       const errorText = await response.text();
@@ -86,12 +81,10 @@ export const getCryptocurrencyChart = async (id: string, days: number = 1): Prom
   
   // Return cached data if it's still valid
   if (isChartCacheValid(cacheKey)) {
-    console.log(`returning cached chart for ${id}`);
     return chartCache.get(cacheKey)!.data;
   }
 
   try {
-    console.log(`fetching chart for ${id}`);
     const response = await fetch(
       `${API_BASE_URL}/coins/${id}/market_chart?vs_currency=usd&days=${days}`
     );

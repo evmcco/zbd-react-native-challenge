@@ -1,5 +1,5 @@
-import { API_BASE_URL } from './utils';
 import type { Cryptocurrency } from './types';
+import { API_BASE_URL } from './utils';
 
 // Cache configuration
 const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes in milliseconds
@@ -14,12 +14,10 @@ const isCacheValid = (): boolean => {
 export const getTopCryptocurrencies = async (): Promise<Cryptocurrency[]> => {
   // Return cached data if it's still valid
   if (isCacheValid()) {
-    console.log("returning cached data")
     return cachedData!;
   }
 
   try {
-    console.log("fetching crypto data")
     const response = await fetch(
       `${API_BASE_URL}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=${10}&page=1&sparkline=false`
     );

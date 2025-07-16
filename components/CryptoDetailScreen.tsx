@@ -3,26 +3,23 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  Dimensions,
   Image,
   Modal,
   ScrollView,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { LineGraph } from 'react-native-graph';
 import { getCryptocurrencyChart, getCryptocurrencyDetail } from '../services/detailService';
 import type { ChartDataPoint, CryptocurrencyDetail } from '../services/types';
 import { formatMarketCap, formatPercentageChange, formatPrice } from '../services/utils';
+import { PriceChart } from './PriceChart';
 
 interface CryptoDetailScreenProps {
   onClose: () => void;
   cryptoId: string;
 }
-
-const screenWidth = Dimensions.get('window').width;
 
 export const CryptoDetailScreen = ({ onClose, cryptoId }: CryptoDetailScreenProps) => {
   const [cryptoDetail, setCryptoDetail] = useState<CryptocurrencyDetail | null>(null);
@@ -57,10 +54,10 @@ export const CryptoDetailScreen = ({ onClose, cryptoId }: CryptoDetailScreenProp
   const renderStatCard = (title: string, value: string, change?: number) => (
     <View className="bg-white p-4 rounded-lg border border-gray-200">
       <Text className="text-sm text-gray-500 mb-1">{title}</Text>
-      <Text className="text-lg font-semibold text-gray-900">{value}</Text>
-      {change !== undefined && (
+      {value !== '' && <Text className="text-lg font-semibold text-gray-900">{value}</Text>}
+      {change && (
         <Text
-          className={`text-sm font-medium ${change >= 0 ? 'text-green-600' : 'text-red-600'
+          className={`text-lg font-medium ${change >= 0 ? 'text-green-600' : 'text-red-600'
             }`}
         >
           {formatPercentageChange(change)}
@@ -96,7 +93,7 @@ export const CryptoDetailScreen = ({ onClose, cryptoId }: CryptoDetailScreenProp
       onRequestClose={onClose}
     >
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <View className="flex-1 bg-gray-50">
+        <View className="flex-1 bg-gray-50 mb-20">
           <View className="flex-row items-center justify-between p-4 bg-white border-b border-gray-200">
             <TouchableOpacity
               onPress={onClose}
@@ -153,45 +150,14 @@ export const CryptoDetailScreen = ({ onClose, cryptoId }: CryptoDetailScreenProp
                 </View>
               </View>
 
-              {/* 24h Price Chart */}
-              <View className="bg-white mx-4 mt-4 p-4 rounded-lg border border-gray-200">
-                <Text className="text-lg font-semibold text-gray-900 mb-4">
-                  24 Hour Price Chart
-                </Text>
-                {chartData.length > 0 ? (
-                  <LineGraph
-                    points={chartData}
-                    animated={true}
-                    color="#3B82F6"
-                    style={{ width: screenWidth - 64, height: 200 }}
-                    enablePanGesture={true}
-                    // enableIndicator={true}
-                    // indicatorPulsating={true}
-                    TopAxisLabel={() => (
-                      <Text className="text-xs text-gray-500">
-                        {formatPrice(Math.max(...chartData.map(p => p.value)))}
-                      </Text>
-                    )}
-                    BottomAxisLabel={() => (
-                      <Text className="text-xs text-gray-500">
-                        {formatPrice(Math.min(...chartData.map(p => p.value)))}
-                      </Text>
-                    )}
-                  />
-                ) : (
-                  <View className="h-48 justify-center items-center">
-                    <Text className="text-gray-500">Chart data not available</Text>
-                  </View>
-                )}
-              </View>
+              <PriceChart chartData={chartData} currentPrice={formatPrice(cryptoDetail?.current_price || 0)} />
 
-              {/* Statistics Grid */}
               <View className="p-4 space-y-4">
                 <Text className="text-lg font-semibold text-gray-900 mb-2">
                   Statistics
                 </Text>
 
-                <View className="grid grid-cols-2 gap-4">
+                <View className="grid grid-cols-2 gap-2">
                   {renderStatCard(
                     'Market Cap',
                     formatMarketCap(cryptoDetail?.market_cap || 0)
@@ -200,9 +166,7 @@ export const CryptoDetailScreen = ({ onClose, cryptoId }: CryptoDetailScreenProp
                     '24h Volume',
                     formatMarketCap(cryptoDetail?.total_volume || 0)
                   )}
-                </View>
 
-                <View className="grid grid-cols-2 gap-4">
                   {renderStatCard(
                     '24h High',
                     formatPrice(cryptoDetail?.high_24h || 0)
@@ -211,9 +175,7 @@ export const CryptoDetailScreen = ({ onClose, cryptoId }: CryptoDetailScreenProp
                     '24h Low',
                     formatPrice(cryptoDetail?.low_24h || 0)
                   )}
-                </View>
 
-                <View className="grid grid-cols-2 gap-4">
                   {renderStatCard(
                     '7d Change',
                     '',
@@ -225,22 +187,8 @@ export const CryptoDetailScreen = ({ onClose, cryptoId }: CryptoDetailScreenProp
                     cryptoDetail?.price_change_percentage_30d
                   )}
                 </View>
-
-                {cryptoDetail?.circulating_supply && (
-                  <View className="grid grid-cols-2 gap-4">
-                    {renderStatCard(
-                      'Circulating Supply',
-                      cryptoDetail.circulating_supply.toLocaleString()
-                    )}
-                    {cryptoDetail.total_supply && renderStatCard(
-                      'Total Supply',
-                      cryptoDetail.total_supply.toLocaleString()
-                    )}
-                  </View>
-                )}
               </View>
 
-              {/* Description */}
               {cryptoDetail?.description?.en && (
                 <View className="bg-white mx-4 mb-4 p-4 rounded-lg border border-gray-200">
                   <Text className="text-lg font-semibold text-gray-900 mb-2">
