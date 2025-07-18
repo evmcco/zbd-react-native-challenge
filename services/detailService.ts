@@ -2,7 +2,7 @@ import type { ChartDataPoint, CryptocurrencyDetail } from './types';
 import { API_BASE_URL } from './utils';
 
 // Cache for cryptocurrency details
-const DETAIL_CACHE_DURATION = 30 * 1000; // 30 seconds in milliseconds
+const DETAIL_CACHE_DURATION = 30 * 60 * 1000; // 30 minutes in milliseconds
 const detailCache = new Map<string, { data: CryptocurrencyDetail; timestamp: number }>();
 
 const isDetailCacheValid = (id: string): boolean => {

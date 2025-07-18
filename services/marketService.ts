@@ -2,7 +2,7 @@ import type { Cryptocurrency } from './types';
 import { API_BASE_URL } from './utils';
 
 // Cache configuration
-const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes in milliseconds
+const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes in milliseconds
 let cachedData: Cryptocurrency[] | null = null;
 let cacheTimestamp: number | null = null;
 
