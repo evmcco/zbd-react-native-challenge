@@ -11,8 +11,8 @@ import {
   View,
 } from 'react-native';
 import { getTopCryptocurrencies } from '../services/marketService';
-import { formatMarketCap, formatPercentageChange, formatPrice } from '../services/utils';
 import type { Cryptocurrency } from '../services/types';
+import { formatMarketCap, formatPercentageChange, formatPrice } from '../services/utils';
 
 interface CryptoDrawerProps {
   isVisible: boolean;
@@ -49,15 +49,12 @@ export const CryptoDrawer = ({ isVisible, onClose, onCryptoSelect }: CryptoDrawe
   const renderCryptoItem = ({ item }: { item: Cryptocurrency }) => (
     <TouchableOpacity
       onPress={() => handleCryptoPress(item)}
-      className="flex-row items-center p-4 border-b border-gray-200 bg-white"
+      className="flex-row items-center py-2 px-6 border-b border-gray-200 bg-white"
     >
       <View className="flex-row items-center flex-1">
-        <Text className="text-lg font-bold text-gray-800 w-8">
-          {item.market_cap_rank}
-        </Text>
         <Image
           source={{ uri: item.image }}
-          className="w-8 h-8 mx-3"
+          className="w-8 h-8 mr-3"
           resizeMode="contain"
         />
         <View className="flex-1">
@@ -86,8 +83,6 @@ export const CryptoDrawer = ({ isVisible, onClose, onCryptoSelect }: CryptoDrawe
           {formatMarketCap(item.market_cap)}
         </Text>
       </View>
-      
-      <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
     </TouchableOpacity>
   );
 
