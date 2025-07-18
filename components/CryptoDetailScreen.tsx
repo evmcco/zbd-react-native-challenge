@@ -15,6 +15,7 @@ import { getCryptocurrencyDetail } from '../services/detailService';
 import type { CryptocurrencyDetail } from '../services/types';
 import { formatMarketCap, formatPercentageChange, formatPrice } from '../services/utils';
 import { PriceChart } from './PriceChart';
+import { PriceAlertModal } from './PriceAlertModal';
 
 interface CryptoDetailScreenProps {
   onClose: () => void;
@@ -24,6 +25,7 @@ interface CryptoDetailScreenProps {
 export const CryptoDetailScreen = ({ onClose, cryptoId }: CryptoDetailScreenProps) => {
   const [cryptoDetail, setCryptoDetail] = useState<CryptocurrencyDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAlertModalVisible, setIsAlertModalVisible] = useState(false);
 
   const fetchCryptoDetail = useCallback(async () => {
     setLoading(true);
@@ -146,6 +148,17 @@ export const CryptoDetailScreen = ({ onClose, cryptoId }: CryptoDetailScreenProp
 
               <PriceChart cryptoId={cryptoId} currentPrice={formatPrice(cryptoDetail?.current_price || 0)} />
 
+              {/* Price Alert Button */}
+              <TouchableOpacity
+                onPress={() => setIsAlertModalVisible(true)}
+                className="bg-blue-500 mx-4 mt-4 p-4 rounded-lg flex-row items-center justify-center"
+              >
+                <Ionicons name="notifications" size={24} color="white" />
+                <Text className="text-white font-semibold text-lg ml-2">
+                  Set Price Alert
+                </Text>
+              </TouchableOpacity>
+
               <View className="p-4 space-y-4">
                 <Text className="text-lg font-semibold text-gray-900 mb-2">
                   Statistics
@@ -198,6 +211,15 @@ export const CryptoDetailScreen = ({ onClose, cryptoId }: CryptoDetailScreenProp
           )}
         </View>
       </GestureHandlerRootView>
+      
+      {/* Price Alert Modal */}
+      <PriceAlertModal
+        isVisible={isAlertModalVisible}
+        onClose={() => setIsAlertModalVisible(false)}
+        cryptoId={cryptoId}
+        cryptoName={cryptoDetail?.name || ''}
+        currentPrice={cryptoDetail?.current_price || 0}
+      />
     </Modal>
   );
 };
