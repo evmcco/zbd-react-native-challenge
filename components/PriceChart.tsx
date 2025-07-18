@@ -1,9 +1,11 @@
 import { formatPrice } from "@/services/utils";
+import * as Localization from 'expo-localization';
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Dimensions, Text, TouchableOpacity, View } from "react-native";
 import { LineGraph } from "react-native-graph";
 import { getCryptocurrencyChart } from '../services/detailService';
 import { ChartDataPoint } from '../services/types';
+
 
 type PriceChartProps = {
   cryptoId: string;
@@ -22,10 +24,17 @@ const TIME_INTERVALS: TimeInterval[] = [
   { label: '1Y', days: 365 },
 ];
 
+type InteractiveGraphPriceInfo = {
+  price: string;
+  date: Date | null
+}
+
 const screenWidth = Dimensions.get('window').width;
 
 export const PriceChart = ({ cryptoId, currentPrice }: PriceChartProps) => {
-  const [priceTitle, setPriceTitle] = useState<string>(currentPrice);
+  // const [priceTitle, setPriceTitle] = useState<string>(currentPrice);
+  // const [priceDate, setPriceDate] = useState<Date | null>(null)
+  const [priceInfo, setPriceInfo] = useState<InteractiveGraphPriceInfo>({ price: currentPrice, date: null })
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [selectedInterval, setSelectedInterval] = useState<TimeInterval>(TIME_INTERVALS[0]); // Default to 1D
   const [chartLoading, setChartLoading] = useState(false);
@@ -56,12 +65,21 @@ export const PriceChart = ({ cryptoId, currentPrice }: PriceChartProps) => {
   return (
     <View className="bg-white mx-4 mt-4 p-4 rounded-lg border border-gray-200">
       <View className="flex-row justify-between items-center mb-4">
-        <Text className="text-lg font-semibold text-gray-900">
-          {selectedInterval.label} Price Chart
-        </Text>
-        <Text className="text-2xl font-semibold text-gray-900">
-          {priceTitle}
-        </Text>
+        <View className="flex-col">
+          <Text className="text-2xl font-semibold text-gray-900">
+            {priceInfo.price}
+          </Text>
+          {priceInfo.date && <Text className="text-l font-semibold text-gray-900">
+            {priceInfo.date.toLocaleString('en-US', {
+              timeZone: Localization.getCalendars()[0].timeZone || 'EDT',
+              year: 'numeric',
+              month: 'numeric',
+              day: 'numeric',
+              hour: 'numeric',
+              minute: '2-digit'
+            })}
+          </Text>}
+        </View>
       </View>
 
 
@@ -79,8 +97,8 @@ export const PriceChart = ({ cryptoId, currentPrice }: PriceChartProps) => {
           style={{ width: screenWidth - 64, height: 200 }}
           enablePanGesture={true}
           enableIndicator={true}
-          onPointSelected={(p) => setPriceTitle(formatPrice(p.value))}
-          onGestureEnd={() => setPriceTitle(currentPrice)}
+          onPointSelected={(p) => setPriceInfo({ price: formatPrice(p.value), date: p.date })}
+          onGestureEnd={() => setPriceInfo({ price: currentPrice, date: null })}
         />
       ) : (
         <View className="h-48 justify-center items-center">
