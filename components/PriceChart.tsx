@@ -20,7 +20,6 @@ const TIME_INTERVALS: TimeInterval[] = [
   { label: '7D', days: 7 },
   { label: '30D', days: 30 },
   { label: '1Y', days: 365 },
-  { label: '5Y', days: 5 * 365 },
 ];
 
 const screenWidth = Dimensions.get('window').width;
