@@ -1,3 +1,4 @@
+import CustomDrawerContent from '@/components/CustomDrawer';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
@@ -19,12 +20,19 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <Drawer>
+        <Drawer drawerContent={(props) => <CustomDrawerContent {...props} />}>
           <Drawer.Screen
-            name="index" // This is the name of the page and must match the url from root
+            name="index"
             options={{
               drawerLabel: 'Home',
-              title: 'overview',
+              title: 'Overview',
+            }}
+          />
+          <Drawer.Screen
+            name="crypto/[id]"
+            options={{
+              drawerItemStyle: { display: 'none' },
+              title: 'Details',
             }}
           />
         </Drawer>

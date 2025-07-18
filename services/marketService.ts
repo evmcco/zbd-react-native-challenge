@@ -31,7 +31,7 @@ export const getTopCryptocurrencies = async (): Promise<Cryptocurrency[]> => {
     // Update cache
     cachedData = data;
     cacheTimestamp = Date.now();
-    
+    console.log("!!!", data.map(a => a.image))
     return data;
   } catch (error) {
     console.error('Error fetching cryptocurrency data:', error);

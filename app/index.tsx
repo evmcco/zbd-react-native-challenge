@@ -2,8 +2,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
-import { CryptoDetailScreen } from '@/components/CryptoDetailScreen';
-import { CryptoDrawer } from '@/components/CryptoDrawer';
 
 import "../global.css";
 
@@ -34,18 +32,18 @@ export default function HomeScreen() {
         </Text>
       </TouchableOpacity>
 
-      <CryptoDrawer
+      {/* <CryptoDrawer
         isVisible={isDrawerVisible}
         onClose={() => setIsDrawerVisible(false)}
         onCryptoSelect={handleCryptoSelect}
-      />
+      /> */}
 
-      {selectedCryptoId && (
+      {/* {selectedCryptoId && (
         <CryptoDetailScreen
           onClose={handleDetailClose}
           cryptoId={selectedCryptoId}
         />
-      )}
+      )} */}
     </>
   );
 }

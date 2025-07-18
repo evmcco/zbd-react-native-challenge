@@ -4,7 +4,6 @@ import {
   ActivityIndicator,
   Alert,
   Image,
-  Modal,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -18,11 +17,10 @@ import { PriceChart } from './PriceChart';
 import { PriceAlertModal } from './PriceAlertModal';
 
 interface CryptoDetailScreenProps {
-  onClose: () => void;
   cryptoId: string;
 }
 
-export const CryptoDetailScreen = ({ onClose, cryptoId }: CryptoDetailScreenProps) => {
+export const CryptoDetailScreen = ({ cryptoId }: CryptoDetailScreenProps) => {
   const [cryptoDetail, setCryptoDetail] = useState<CryptocurrencyDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAlertModalVisible, setIsAlertModalVisible] = useState(false);
@@ -64,44 +62,26 @@ export const CryptoDetailScreen = ({ onClose, cryptoId }: CryptoDetailScreenProp
 
   if (!cryptoDetail && !loading) {
     return (
-      <Modal
-        animationType="slide"
-        presentationStyle="pageSheet"
-        onRequestClose={onClose}
-      >
-        <View className="flex-1 justify-center items-center bg-gray-50">
-          <Text className="text-lg text-gray-600">Failed to load cryptocurrency details</Text>
-          <TouchableOpacity
-            onPress={onClose}
-            className="mt-4 bg-blue-500 px-6 py-3 rounded-lg"
-          >
-            <Text className="text-white font-semibold">Close</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
+      <View className="flex-1 justify-center items-center bg-gray-50">
+        <Text className="text-lg text-gray-600">Failed to load cryptocurrency details</Text>
+        <TouchableOpacity
+          onPress={fetchCryptoDetail}
+          className="mt-4 bg-blue-500 px-6 py-3 rounded-lg"
+        >
+          <Text className="text-white font-semibold">Retry</Text>
+        </TouchableOpacity>
+      </View>
     );
   }
 
   return (
-    <Modal
-      animationType="slide"
-      presentationStyle="pageSheet"
-      onRequestClose={onClose}
-    >
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <View className="flex-1 bg-gray-50 mb-20">
-          <View className="flex-row items-center justify-between p-4 bg-white border-b border-gray-200">
-            <TouchableOpacity
-              onPress={onClose}
-              className="p-2 rounded-full bg-gray-100"
-            >
-              <Ionicons name="arrow-back" size={24} color="#374151" />
-            </TouchableOpacity>
-            <Text className="text-xl font-bold text-gray-900">
-              {cryptoDetail?.name || 'Loading...'}
-            </Text>
-            <View className="w-10" />
-          </View>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <View className="flex-1 bg-gray-50">
+        <View className="flex-row items-center justify-center p-4 bg-white border-b border-gray-200">
+          <Text className="text-xl font-bold text-gray-900">
+            {cryptoDetail?.name || 'Loading...'}
+          </Text>
+        </View>
 
           {loading ? (
             <View className="flex-1 justify-center items-center">
@@ -210,7 +190,6 @@ export const CryptoDetailScreen = ({ onClose, cryptoId }: CryptoDetailScreenProp
             </ScrollView>
           )}
         </View>
-      </GestureHandlerRootView>
       
       {/* Price Alert Modal */}
       <PriceAlertModal
@@ -220,6 +199,6 @@ export const CryptoDetailScreen = ({ onClose, cryptoId }: CryptoDetailScreenProp
         cryptoName={cryptoDetail?.name || ''}
         currentPrice={cryptoDetail?.current_price || 0}
       />
-    </Modal>
+    </GestureHandlerRootView>
   );
 };
