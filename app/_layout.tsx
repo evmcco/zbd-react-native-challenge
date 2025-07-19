@@ -1,15 +1,13 @@
 import { AlertsBellIcon } from '@/components/AlertsBellIcon';
 import CustomDrawerContent from '@/components/CustomDrawer';
 import { AlertsProvider } from '@/contexts/AlertsContext';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Drawer } from 'expo-router/drawer';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
@@ -20,7 +18,7 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={DefaultTheme}>
       <AlertsProvider>
         <GestureHandlerRootView style={{ flex: 1 }}>
           <Drawer drawerContent={(props) => <CustomDrawerContent {...props} />}>
