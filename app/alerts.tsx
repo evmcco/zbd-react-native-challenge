@@ -1,8 +1,9 @@
 import { useCrypto } from '@/contexts/CryptoContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import React, { useCallback } from 'react';
-import { Image, ScrollView, Text, View } from 'react-native';
+import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useAlerts } from '../contexts/AlertsContext';
 import '../global.css';
 import { formatPrice } from '../services/utils';
@@ -10,6 +11,7 @@ import { formatPrice } from '../services/utils';
 export default function AlertsScreen() {
   const { triggeredAlerts, clearAllAlerts } = useAlerts();
   const { cryptos, loading, error } = useCrypto();
+  const router = useRouter();
 
 
   useFocusEffect(
@@ -52,9 +54,10 @@ export default function AlertsScreen() {
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         <View className="p-4">
           {triggeredAlerts.map((alert, index) => (
-            <View
+            <TouchableOpacity
               key={`${alert.id}-${index}`}
               className="bg-white rounded-lg p-4 mb-3 border border-gray-200 shadow-sm"
+              onPress={() => { router.push(`/crypto/${alert.cryptoId}`) }}
             >
               <View className="flex-row items-start">
                 <Image
@@ -104,10 +107,10 @@ export default function AlertsScreen() {
                   />
                 </View>
               </View>
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
-      </ScrollView>
-    </View>
+      </ScrollView >
+    </View >
   );
 }
