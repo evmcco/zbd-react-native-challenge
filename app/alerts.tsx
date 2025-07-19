@@ -1,14 +1,16 @@
+import { useCrypto } from '@/contexts/CryptoContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import React, { useCallback } from 'react';
 import { Image, ScrollView, Text, View } from 'react-native';
-import { TOP_CRYPTOS } from '../constants/cryptoData';
 import { useAlerts } from '../contexts/AlertsContext';
 import '../global.css';
 import { formatPrice } from '../services/utils';
 
 export default function AlertsScreen() {
   const { triggeredAlerts, clearAllAlerts } = useAlerts();
+  const { cryptos, loading, error } = useCrypto();
+
 
   useFocusEffect(
     useCallback(() => {
@@ -20,8 +22,8 @@ export default function AlertsScreen() {
   );
 
   const getCryptoImage = (cryptoId: string) => {
-    const crypto = TOP_CRYPTOS.find(c => c.id === cryptoId);
-    return crypto?.imageUrl || '';
+    const crypto = cryptos.find(c => c.id === cryptoId);
+    return crypto?.image || '';
   };
 
   const formatTimestamp = (date: Date) => {

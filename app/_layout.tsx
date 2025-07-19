@@ -1,6 +1,7 @@
 import { AlertsBellIcon } from '@/components/AlertsBellIcon';
 import CustomDrawerContent from '@/components/CustomDrawer';
 import { AlertsProvider } from '@/contexts/AlertsContext';
+import { CryptoProvider } from '@/contexts/CryptoContext';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Drawer } from 'expo-router/drawer';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -9,9 +10,10 @@ import 'react-native-reanimated';
 export default function RootLayout() {
   return (
     <ThemeProvider value={DefaultTheme}>
-      <AlertsProvider>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <Drawer drawerContent={(props) => <CustomDrawerContent {...props} />}>
+      <CryptoProvider>
+        <AlertsProvider>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <Drawer drawerContent={(props) => <CustomDrawerContent {...props} />}>
             <Drawer.Screen
               name="index"
               options={{
@@ -39,6 +41,7 @@ export default function RootLayout() {
           </Drawer>
         </GestureHandlerRootView>
       </AlertsProvider>
-    </ThemeProvider>
+    </CryptoProvider>
+  </ThemeProvider>
   );
 }
