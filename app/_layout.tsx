@@ -1,4 +1,6 @@
+import { AlertsBellIcon } from '@/components/AlertsBellIcon';
 import CustomDrawerContent from '@/components/CustomDrawer';
+import { AlertsProvider } from '@/contexts/AlertsContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
@@ -19,24 +21,36 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <Drawer drawerContent={(props) => <CustomDrawerContent {...props} />}>
-          <Drawer.Screen
-            name="index"
-            options={{
-              drawerLabel: 'Home',
-              title: 'Overview',
-            }}
-          />
-          <Drawer.Screen
-            name="crypto/[id]"
-            options={{
-              drawerItemStyle: { display: 'none' },
-              title: 'Details',
-            }}
-          />
-        </Drawer>
-      </GestureHandlerRootView>
+      <AlertsProvider>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <Drawer drawerContent={(props) => <CustomDrawerContent {...props} />}>
+            <Drawer.Screen
+              name="index"
+              options={{
+                drawerLabel: 'Home',
+                title: 'Overview',
+                headerRight: () => <AlertsBellIcon />,
+              }}
+            />
+            <Drawer.Screen
+              name="alerts"
+              options={{
+                drawerItemStyle: { display: 'none' },
+                drawerLabel: 'Alerts',
+                title: 'Alerts',
+              }}
+            />
+            <Drawer.Screen
+              name="crypto/[id]"
+              options={{
+                drawerItemStyle: { display: 'none' },
+                title: 'Details',
+                headerRight: () => <AlertsBellIcon />,
+              }}
+            />
+          </Drawer>
+        </GestureHandlerRootView>
+      </AlertsProvider>
     </ThemeProvider>
   );
 }

@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { useAlerts } from '../../contexts/AlertsContext';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { PriceAlertModal } from '../../components/PriceAlertModal';
 import { PriceChart } from '../../components/PriceChart';
@@ -23,6 +24,7 @@ export default function CryptoDetailScreen() {
   const [isAlertModalVisible, setIsAlertModalVisible] = useState(false);
   const { id } = useLocalSearchParams<{ id: string }>();
   const navigation = useNavigation();
+  const { checkPriceAlerts } = useAlerts();
 
   const fetchCryptoDetail = useCallback(async () => {
     setLoading(true);
@@ -33,12 +35,17 @@ export default function CryptoDetailScreen() {
       navigation.setOptions({
         title: detail ? detail.name : 'Details',
       });
+      
+      // Check price alerts
+      if (detail && detail.current_price) {
+        await checkPriceAlerts(id, detail.current_price);
+      }
     } catch (error) {
       Alert.alert('Error', 'Failed to fetch cryptocurrency details');
     } finally {
       setLoading(false);
     }
-  }, [id, navigation]);
+  }, [id, navigation, checkPriceAlerts]);
 
   useEffect(() => {
     if (id) {
