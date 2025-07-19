@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+import { PriceAlertComponent } from '@/components/PriceAlert';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
@@ -10,10 +10,9 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { useAlerts } from '../../contexts/AlertsContext';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { PriceAlertModal } from '../../components/PriceAlertModal';
 import { PriceChart } from '../../components/PriceChart';
+import { useAlerts } from '../../contexts/AlertsContext';
 import { getCryptocurrencyDetail } from '../../services/detailService';
 import type { CryptocurrencyDetail } from '../../services/types';
 import { formatMarketCap, formatPercentageChange, formatPrice } from '../../services/utils';
@@ -21,7 +20,6 @@ import { formatMarketCap, formatPercentageChange, formatPrice } from '../../serv
 export default function CryptoDetailScreen() {
   const [cryptoDetail, setCryptoDetail] = useState<CryptocurrencyDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isAlertModalVisible, setIsAlertModalVisible] = useState(false);
   const { id } = useLocalSearchParams<{ id: string }>();
   const navigation = useNavigation();
   const { checkPriceAlerts } = useAlerts();
@@ -35,7 +33,7 @@ export default function CryptoDetailScreen() {
       navigation.setOptions({
         title: detail ? detail.name : 'Details',
       });
-      
+
       // Check price alerts
       if (detail && detail.current_price) {
         await checkPriceAlerts(id, detail.current_price);
@@ -132,16 +130,7 @@ export default function CryptoDetailScreen() {
 
             <PriceChart cryptoId={id} currentPrice={formatPrice(cryptoDetail?.current_price || 0)} />
 
-            {/* Price Alert Button */}
-            <TouchableOpacity
-              onPress={() => setIsAlertModalVisible(true)}
-              className="bg-blue-500 mx-4 mt-4 p-4 rounded-lg flex-row items-center justify-center"
-            >
-              <Ionicons name="notifications" size={24} color="white" />
-              <Text className="text-white font-semibold text-lg ml-2">
-                Set Price Alert
-              </Text>
-            </TouchableOpacity>
+            <PriceAlertComponent cryptoId={id} cryptoName={cryptoDetail?.name || ''} />
 
             <View className="p-4 space-y-4">
               <Text className="text-lg font-semibold text-gray-900 mb-2">
@@ -194,15 +183,6 @@ export default function CryptoDetailScreen() {
           </ScrollView>
         )}
       </View>
-
-      {/* Price Alert Modal */}
-      <PriceAlertModal
-        isVisible={isAlertModalVisible}
-        onClose={() => setIsAlertModalVisible(false)}
-        cryptoId={id}
-        cryptoName={cryptoDetail?.name || ''}
-        currentPrice={cryptoDetail?.current_price || 0}
-      />
     </GestureHandlerRootView>
   );
 }
