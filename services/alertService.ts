@@ -1,11 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+export type PriceDirection = 'above' | 'below'
+
 export interface PriceAlert {
   id: string;
   cryptoId: string;
   cryptoName: string;
   targetPrice: number;
-  direction: 'above' | 'below';
+  direction: PriceDirection;
   createdAt: Date;
 }
 

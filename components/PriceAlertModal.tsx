@@ -1,17 +1,16 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
+  Alert,
+  KeyboardAvoidingView,
   Modal,
-  View,
+  Platform,
   Text,
   TextInput,
   TouchableOpacity,
-  Alert,
-  FlatList,
-  KeyboardAvoidingView,
-  Platform,
+  View
 } from 'react-native';
-import { PriceAlert, saveAlert, getAlertForCrypto, deleteAlert } from '../services/alertService';
+import { deleteAlert, getAlertForCrypto, PriceAlert, PriceDirection, saveAlert } from '../services/alertService';
 import { formatPrice } from '../services/utils';
 
 interface PriceAlertModalProps {
@@ -30,21 +29,15 @@ export const PriceAlertModal = ({
   currentPrice,
 }: PriceAlertModalProps) => {
   const [targetPrice, setTargetPrice] = useState('');
-  const [direction, setDirection] = useState<'above' | 'below'>('above');
+  const [direction, setDirection] = useState<PriceDirection>('above');
   const [alert, setAlert] = useState<PriceAlert | null>(null);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (isVisible) {
-      loadAlert();
-    }
-  }, [isVisible, cryptoId]);
-
-  const loadAlert = async () => {
+  const loadAlert = useCallback(async () => {
     try {
       const existingAlert = await getAlertForCrypto(cryptoId);
       setAlert(existingAlert);
-      
+
       // If there's an existing alert, populate the form
       if (existingAlert) {
         setTargetPrice(existingAlert.targetPrice.toString());
@@ -56,7 +49,14 @@ export const PriceAlertModal = ({
     } catch (error) {
       console.error('Error loading alert:', error);
     }
-  };
+  }, [cryptoId]);
+
+  useEffect(() => {
+    if (isVisible) {
+      loadAlert();
+    }
+  }, [isVisible, cryptoId, loadAlert]);
+
 
   const handleSaveAlert = async () => {
     if (!targetPrice.trim()) {
@@ -78,7 +78,7 @@ export const PriceAlertModal = ({
         targetPrice: price,
         direction,
       });
-      
+
       await loadAlert();
       Alert.alert('Success', 'Price alert saved successfully!');
     } catch (error) {
@@ -90,7 +90,7 @@ export const PriceAlertModal = ({
 
   const handleDeleteAlert = async () => {
     if (!alert) return;
-    
+
     try {
       await deleteAlert(alert.id);
       await loadAlert();
@@ -102,7 +102,7 @@ export const PriceAlertModal = ({
 
   const renderCurrentAlert = () => {
     if (!alert) return null;
-    
+
     return (
       <View className="p-4 bg-gray-50 rounded-lg mb-4">
         <View className="flex-row justify-between items-center">
@@ -118,7 +118,7 @@ export const PriceAlertModal = ({
             onPress={handleDeleteAlert}
             className="p-2 bg-red-100 rounded-full"
           >
-            <Ionicons name="trash" size={16} color="#EF4444" />
+            <Ionicons name="trash" size={16} color="red" />
           </TouchableOpacity>
         </View>
       </View>
@@ -137,7 +137,6 @@ export const PriceAlertModal = ({
         className="flex-1"
       >
         <View className="flex-1 bg-white">
-          {/* Header */}
           <View className="flex-row items-center justify-between p-4 border-b border-gray-200">
             <Text className="text-xl font-bold text-gray-900">
               Price Alerts
@@ -151,7 +150,6 @@ export const PriceAlertModal = ({
           </View>
 
           <View className="flex-1 p-4">
-            {/* Crypto Info */}
             <View className="mb-6">
               <Text className="text-lg font-semibold text-gray-900 mb-2">
                 {cryptoName}
@@ -161,51 +159,43 @@ export const PriceAlertModal = ({
               </Text>
             </View>
 
-            {/* Current Alert Display */}
             {renderCurrentAlert()}
 
-            {/* Add/Edit Alert Section */}
             <View className="mb-6">
               <Text className="text-base font-semibold text-gray-900 mb-3">
                 {alert ? 'Edit Alert' : 'Set New Alert'}
               </Text>
-              
-              {/* Direction Selection */}
+
               <View className="flex-row mb-3">
                 <TouchableOpacity
                   onPress={() => setDirection('above')}
-                  className={`flex-1 py-3 px-4 rounded-l-lg border ${
-                    direction === 'above' 
-                      ? 'bg-blue-500 border-blue-500' 
-                      : 'bg-gray-50 border-gray-200'
-                  }`}
+                  className={`flex-1 py-3 px-4 rounded-l-lg border ${direction === 'above'
+                    ? 'bg-blue-500 border-blue-500'
+                    : 'bg-gray-50 border-gray-200'
+                    }`}
                 >
-                  <Text className={`text-center font-medium ${
-                    direction === 'above' ? 'text-white' : 'text-gray-700'
-                  }`}>
-                    Price goes Above
+                  <Text className={`text-center font-medium ${direction === 'above' ? 'text-white' : 'text-gray-700'
+                    }`}>
+                    Above
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => setDirection('below')}
-                  className={`flex-1 py-3 px-4 rounded-r-lg border ${
-                    direction === 'below' 
-                      ? 'bg-blue-500 border-blue-500' 
-                      : 'bg-gray-50 border-gray-200'
-                  }`}
+                  className={`flex-1 py-3 px-4 rounded-r-lg border ${direction === 'below'
+                    ? 'bg-blue-500 border-blue-500'
+                    : 'bg-gray-50 border-gray-200'
+                    }`}
                 >
-                  <Text className={`text-center font-medium ${
-                    direction === 'below' ? 'text-white' : 'text-gray-700'
-                  }`}>
-                    Price goes Below
+                  <Text className={`text-center font-medium ${direction === 'below' ? 'text-white' : 'text-gray-700'
+                    }`}>
+                    Below
                   </Text>
                 </TouchableOpacity>
               </View>
 
-              {/* Price Input */}
               <View className="flex-row items-center space-x-3">
                 <TextInput
-                  className="flex-1 px-4 py-3 bg-gray-50 rounded-lg border border-gray-200"
+                  className="flex-1 px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 mr-2"
                   placeholder="Enter target price..."
                   value={targetPrice}
                   onChangeText={setTargetPrice}
@@ -215,9 +205,8 @@ export const PriceAlertModal = ({
                 <TouchableOpacity
                   onPress={handleSaveAlert}
                   disabled={loading}
-                  className={`px-6 py-3 rounded-lg ${
-                    loading ? 'bg-gray-400' : 'bg-blue-500'
-                  }`}
+                  className={`px-6 py-3 rounded-lg ${loading ? 'bg-gray-400' : 'bg-blue-500'
+                    }`}
                 >
                   <Text className="text-white font-semibold">
                     {loading ? 'Saving...' : (alert ? 'Update' : 'Save')}
@@ -226,7 +215,6 @@ export const PriceAlertModal = ({
               </View>
             </View>
 
-            {/* Instructions */}
             {!alert && (
               <View className="flex-1 justify-center items-center">
                 <Ionicons name="notifications-off" size={64} color="#D1D5DB" />
