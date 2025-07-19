@@ -32,8 +32,6 @@ type InteractiveGraphPriceInfo = {
 const screenWidth = Dimensions.get('window').width;
 
 export const PriceChart = ({ cryptoId, currentPrice }: PriceChartProps) => {
-  // const [priceTitle, setPriceTitle] = useState<string>(currentPrice);
-  // const [priceDate, setPriceDate] = useState<Date | null>(null)
   const [priceInfo, setPriceInfo] = useState<InteractiveGraphPriceInfo>({ price: currentPrice, date: null })
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [selectedInterval, setSelectedInterval] = useState<TimeInterval>(TIME_INTERVALS[0]); // Default to 1D
@@ -82,31 +80,32 @@ export const PriceChart = ({ cryptoId, currentPrice }: PriceChartProps) => {
         </View>
       </View>
 
-
-
-      {chartLoading ? (
-        <View className="h-48 justify-center items-center">
-          <ActivityIndicator size="large" color="#3B82F6" />
-          <Text className="mt-2 text-gray-600">Loading chart...</Text>
-        </View>
-      ) : chartData.length > 0 ? (
-        <LineGraph
-          points={chartData}
-          animated={true}
-          color="#3B82F6"
-          style={{ width: screenWidth - 64, height: 200 }}
-          enablePanGesture={true}
-          enableIndicator={true}
-          onPointSelected={(p) => setPriceInfo({ price: formatPrice(p.value), date: p.date })}
-          onGestureEnd={() => setPriceInfo({ price: currentPrice, date: null })}
-        />
-      ) : (
-        <View className="h-48 justify-center items-center">
-          <Text className="text-gray-500">Chart data not available</Text>
-        </View>
-      )}
-      {/* Time Interval Buttons */}
-      <View className="flex-row justify-between mt-4">
+      {
+        chartLoading ? (
+          <View className="h-48 justify-center items-center">
+            <ActivityIndicator size="large" color="#3B82F6" />
+            <Text className="mt-2 text-gray-600">Loading chart...</Text>
+          </View>
+        ) :
+          chartData.length > 0 ? (
+            <LineGraph
+              points={chartData}
+              animated={true}
+              color="#3B82F6"
+              gradientFillColors={['#3B82F6', '#3B82F620']}
+              enableFadeInMask={true}
+              style={{ width: screenWidth - 64, height: 200 }}
+              enablePanGesture={true}
+              enableIndicator={true}
+              onPointSelected={(p) => setPriceInfo({ price: formatPrice(p.value), date: p.date })}
+              onGestureEnd={() => setPriceInfo({ price: currentPrice, date: null })}
+            />
+          ) : (
+            <View className="h-48 justify-center items-center">
+              <Text className="text-gray-500">Chart data not available</Text>
+            </View>
+          )}
+      <View className="flex-row justify-around mt-4">
         {TIME_INTERVALS.map((interval) => (
           <TouchableOpacity
             key={interval.label}
