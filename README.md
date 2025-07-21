@@ -1,50 +1,85 @@
-# Welcome to your Expo app 👋
+<!-- @format -->
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+# 🧪 React Native Coding Challenge
 
-## Get started
+## Crypto Chart Viewer + Price Alerts
 
-1. Install dependencies
+### 🔍 Overview
 
-   ```bash
-   npm install
-   ```
+Build a **Crypto Chart Viewer app** using **React Native with Expo** that:
 
-2. Start the app
+- Displays interactive price charts for **10 cryptocurrencies**
+- Allows users to navigate via a **drawer**
+- Enables users to set **price alerts** per crypto
+- Shows a notification indicator when an alert is triggered
+- Lets users review and clear triggered alerts
 
-   ```bash
-   npx expo start
-   ```
+---
 
-In the output, you'll find options to open the app in a
+## 🎯 Objectives
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### 🧭 Navigation
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- Implement **drawer navigation**
+- The drawer should be a list of **10 cryptocurrencies** by market cap
+- Selecting a currency opens a **detail screen** for that cryptocurrency
 
-## Get a fresh project
+---
 
-When you're ready, run:
+### 📈 Crypto Detail Screen
 
-```bash
-npm run reset-project
-```
+- Show a **price chart** (e.g., last 24h or 7d)
+- Display the **current price**
+- Allow users to **set a price alert** (e.g., "Notify me if the price goes above $70,000")
+- If an alert is already active, display it with an option to cancel or update
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-## Learn more
+### 🚨 Alerts System
 
-To learn more about developing your project with Expo, look at the following resources:
+- Display a **notification icon** in the top-right of the app
+  - Show a badge or indicator when **any alert is triggered**
+- Tapping the icon opens an **Alerts screen**
+  - List all **triggered alerts** with timestamps UTC
+- When alerts are displayed in the log, they are **cleared** and not shown again
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+---
 
-## Join the community
+## 🧩 Technical Requirements
 
-Join our community of developers creating universal apps.
+- Use **React Native with Expo**
+- Style the app using **NativeWind**
+  - How you style is up to you
+- Implement real-time or frequently updated price tracking
+- State management (Your choice of framework)
+- Use **TypeScript** and clean, modular code
+- The app should work smoothly on both **iOS and Android**
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+---
+
+## ✅ What We’re Looking For
+
+- Scalable app structure and clean state architecture
+- Good UX around charts, alert creation, and notifications
+- Clear handling of edge cases (e.g., API failures, invalid inputs, rapid price changes)
+- Maintainable TypeScript usage and reusable components
+
+---
+
+## 💡 Bonus (Optional)
+
+- Animations on the chart render
+- Persist alert state across app restarts
+- Send **push notifications** when a price alert is triggered
+- Implement **deep linking** so that tapping a push notification opens the **Alerts screen** directly
+
+---
+
+## 📝 Submission Instructions
+
+- Include an `OVERVIEW.md` with:
+  - A short overview of your approach
+  - Instructions for running the app
+  - Any limitations, trade-offs, or assumptions made
+- Fork this REPO and push your code
+- Create an apk build and share a link to download it in the README.
